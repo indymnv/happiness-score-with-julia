@@ -1,4 +1,5 @@
 using DataFrames
+using DataFramesMeta
 using CSV
 using Turing
 using Plots
@@ -81,29 +82,24 @@ str_df = select(df_2021, findall(col -> eltype(col) <: String, eachcol(df_2021))
 float_df = float_df[:,Not(names(select(float_df, r"Explained")))]
 
 # pairplot for float variables
-@df float_df cornerplot(cols(1:N), grid = true, size=(3500, 3500), compact = true)
+@df float_df cornerplot(cols(1:N), grid = true, size=(5500, 3200), compact = true)
 
 # heavy intensive so better to get correlation in numbers instead of images
 cm = cor(Matrix(float_df))
-high = findall(x -> abs(x) > 0.75 && abs(x) < 1.0, cm)
-couple_var= [[names(float_df,idx.I[1]); names(float_df, idx.I[2]);] for idx in high]
+cols = Symbol.(names(float_df))
 
-var_1 =[]
-var_2 =[]
-for i in eachindex(couple_var)
-    var_1 = push!(var_1, couple_var[i][1])
-    var_2 = push!(var_2, couple_var[i][2])
-end
-var_1
-var_2
-values = cm[findall(x -> abs(x) > 0.75 && abs(x) < 1.0, cm)]
+(n,m) = size(cm)
+heatmap(cm, 
+        fc = cgrad([:white,:dodgerblue4]),
+        xticks = (1:m,cols),
+        xrot= 90,
+        size= (800, 800),
+        yticks = (1:m,cols),
+        yflip=true)
+annotate!([(j, i, text(round(cm[i,j],digits=3),
+                       8,"Computer Modern",:black))
+           for i in 1:n for j in 1:m])
 
-corr_df = DataFrame("var1" => var_1,
-                    "var2" => var_2, 
-                    "corr" => values)
-
-sort!(corr_df, :corr, rev=true)
-corr_df
 
 #Select only variables considered for analysis (avoiding explained)
 function distribution_plot(df, var_filter, list_elements)
@@ -132,8 +128,6 @@ function distribution_plot(df, var_filter, list_elements)
             label="$element") 
         )
     end
-
-    
 end
 
 #Ladder score distribution with some Regional_indicator
@@ -172,8 +166,6 @@ function distribution_plot(df)
             label="$element") 
         )
     end
-
-    
 end
 
 
@@ -181,19 +173,14 @@ distribution_plot(df_2021)
 
 #savefig("./img/felicidad_paises.png")
 
-plot(filter(row -> row.Country_name == "Japan", df_all).year,
-filter(row -> row.Country_name == "Japan", df_all).Life_Ladder, label="Japan")
-plot!(filter(row -> row.Country_name == "Chile", df_all).year,
-filter(row -> row.Country_name == "Chile", df_all).Life_Ladder, label="Chile")
+#boxplot with all regional_indicator
 
-#Plot countries with larger gap score across the time
-
-#Plot average across the Regional_indicator and see changes in time
-
-#Box plot with all Regional_indicator ladder_score
-
-
-#build a clustering model with kmeans or another to see groups in every single cluster
-
-
-#values[values .>= 1.0]
+@df df_2021 boxplot(
+                df_2021.Regional_indicator,
+                df_2021.Ladder_score,
+                size =(1800,1000),
+               )
+@df df_2021 dotplot!(
+                df_2021.Regional_indicator,
+                df_2021.Ladder_score,
+                size =(1800,1000),)
