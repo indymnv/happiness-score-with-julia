@@ -194,10 +194,6 @@ function(sample_1, sample_2)
     HypothesisTests.ttest()
 end
 
-x = filter(row ->row.Regional_indicator == "South Asia", df_2021).Ladder_score
-y = filter(row ->row.Regional_indicator == "Western Europe", df_2021).Ladder_score
-
-EqualVarianceTTest(vec(x), vec(y))
 
 function t_test_sample(df, var, x , y)
     x = filter(row ->row[var] == x, df).Ladder_score
