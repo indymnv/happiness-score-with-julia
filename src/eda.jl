@@ -8,7 +8,6 @@ using Statistics
 theme(:ggplot2)
 
 df_2021 = DataFrame(CSV.File("./data/2021.csv", normalizenames=true))
-df_all = DataFrame(CSV.File("./data/world-happiness-report.csv", normalizenames=true))
 
 #Describe
 print(describe(df_2021))
@@ -174,13 +173,18 @@ distribution_plot(df_2021)
 #savefig("./img/felicidad_paises.png")
 
 #boxplot with all regional_indicator
-
-@df df_2021 boxplot(
-                df_2021.Regional_indicator,
-                df_2021.Ladder_score,
+function boxplot_plot(df, x, y)
+    display(
+        @df df boxplot(
+                       df[!,x],
+                       df[!,y],
+                size =(1800,1000),
+               )           )
+        @df df dotplot!(
+                        df[!,x],
+                        df[!,y],
                 size =(1800,1000),
                )
-@df df_2021 dotplot!(
-                df_2021.Regional_indicator,
-                df_2021.Ladder_score,
-                size =(1800,1000),)
+end
+
+boxplot_plot(df_2021, "Regional_indicator", "Ladder_score")
