@@ -5,6 +5,7 @@ using Turing
 using Plots
 using StatsPlots
 using Statistics
+using HypothesisTests
 theme(:ggplot2)
 
 df_2021 = DataFrame(CSV.File("./data/2021.csv", normalizenames=true))
@@ -188,3 +189,25 @@ function boxplot_plot(df, x, y)
 end
 
 boxplot_plot(df_2021, "Regional_indicator", "Ladder_score")
+
+function(sample_1, sample_2)
+    HypothesisTests.ttest()
+end
+
+x = filter(row ->row.Regional_indicator == "South Asia", df_2021).Ladder_score
+y = filter(row ->row.Regional_indicator == "Western Europe", df_2021).Ladder_score
+
+EqualVarianceTTest(vec(x), vec(y))
+
+function t_test_sample(df, var, x , y)
+    x = filter(row ->row[var] == x, df).Ladder_score
+    y = filter(row ->row[var] == y, df).Ladder_score
+    EqualVarianceTTest(vec(x), vec(y))
+end
+
+t_test_sample(df_2021, "Regional_indicator", "South Asia", "Western Europe")
+
+t_test_sample(df_2021, "Regional_indicator", "North America and ANZ", "Western Europe")
+
+
+
