@@ -9,7 +9,7 @@ df = DataFrame(CSV.File("./data/2021.csv",normalizenames =true),)
 
 float_df = select(df, findall(col -> eltype(col) <: Float64, eachcol(df)))
 
- kmeans(float_df, 3, maxiter=200, display=:iter)
+float_df = float_df[:,Not(names(select(float_df, r"Explained")))]
 
 function normalize_features(df)
     for col in names(df)
@@ -18,18 +18,20 @@ function normalize_features(df)
     return df
 end
 
-float_df=normalize_features(float_df)
+#float_df=normalize_features(float_df)
 
-names((float_df)
+size(float_df)
 
-float_df.Healthy_life_expectancy
+input = reshape(Matrix(float_df), (12,149))
 
-histogram(float_df.Healthy_life_expectancy)
+size(input)
 
-R = kmeans(Matrix(float_df), 3, maxiter=200, display=:iter)
+result = kmeans(input, 3, maxiter=200, display=:iter)
 
-assignments(R)
-counts(R)
-R.centers
+scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = result.assignments)
 
-R.assignments
+df.cluster = result.assignments
+
+names(df)
+
+filter(row -> row.cluster ==3 , df).Country_name
