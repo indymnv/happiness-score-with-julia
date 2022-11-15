@@ -84,22 +84,28 @@ float_df = float_df[:,Not(names(select(float_df, r"Explained")))]
 # pairplot for float variables
 @df float_df cornerplot(cols(1:N), grid = true, size=(5500, 3200), compact = true)
 
-# heavy intensive so better to get correlation in numbers instead of images
-cm = cor(Matrix(float_df))
-cols = Symbol.(names(float_df))
+#Correlation Matrix with all columns
+function heatmap_cor(df)
+    cm = cor(Matrix(df))
+    cols = Symbol.(names(df))
 
-(n,m) = size(cm)
-heatmap(cm, 
+    (n,m) = size(cm)
+    display(
+    heatmap(cm, 
         fc = cgrad([:white,:dodgerblue4]),
         xticks = (1:m,cols),
         xrot= 90,
         size= (800, 800),
         yticks = (1:m,cols),
-        yflip=true)
-annotate!([(j, i, text(round(cm[i,j],digits=3),
+        yflip=true))
+    display(
+    annotate!([(j, i, text(round(cm[i,j],digits=3),
                        8,"Computer Modern",:black))
            for i in 1:n for j in 1:m])
+    )
+end
 
+heatmap_cor(float_df)
 
 #Select only variables considered for analysis (avoiding explained)
 function distribution_plot(df, var_filter, list_elements)
@@ -203,7 +209,7 @@ end
 
 t_test_sample(df_2021, "Regional_indicator", "South Asia", "Western Europe")
 
-t_test_sample(df_2021, "Regional_indicator", "North America and ANZ", "Western Europe")
+t_test_sample(df_2021, "Regional_indicator", "Western Europe", "Latin America and Caribbean")
 
 
 
