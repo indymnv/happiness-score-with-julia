@@ -4,6 +4,8 @@ using CSV
 using Plots 
 using StatsPlots
 using Statistics
+using Random
+
 
 df = DataFrame(CSV.File("./data/2021.csv",normalizenames =true),)
 
@@ -26,6 +28,7 @@ input = reshape(Matrix(float_df), (12,149))
 
 size(input)
 
+Random.seed!(1234)
 result = kmeans(input, 3, maxiter=200, display=:iter)
 
 scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = result.assignments)
