@@ -179,6 +179,7 @@ distribution_plot(df_2021)
 
 #savefig("./img/felicidad_paises.png")
 
+
 #boxplot with all regional_indicator
 function boxplot_plot(df, x, y)
     display(
@@ -195,11 +196,6 @@ function boxplot_plot(df, x, y)
 end
 
 boxplot_plot(df_2021, "Regional_indicator", "Ladder_score")
-
-function(sample_1, sample_2)
-    HypothesisTests.ttest()
-end
-
 
 function t_test_sample(df, var, x , y)
     x = filter(row ->row[var] == x, df).Ladder_score
