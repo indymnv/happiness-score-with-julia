@@ -34,6 +34,21 @@ names(float_df)
 
 size(input)
 
+wcss = []
+
+for n in 1:10
+    Random.seed!(123)
+    cluster =KMeans(n_clusters=n,
+                    init = "k-means++",
+                    max_iter = 20,
+                    n_init = 10,
+                    random_state = 0)
+    cluster.fit(X)
+    push!(wcss, cluster.inertia_)
+end
+
+plot(wcss)
+
 Random.seed!(123)
 cluster =KMeans(n_clusters=3)
 
@@ -47,6 +62,8 @@ ClusteringResult(result)
 
 scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = cluster.labels_)
 
-df.cluster = result.assignments
+df.cluster = cluster.labels_
 
+df.cluster
 
+filter(row ->row.cluster ==0,df).Country_name
