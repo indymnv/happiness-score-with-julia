@@ -7,6 +7,8 @@ using Statistics
 using Random
 using ScikitLearn
 using PyCall
+Plots.theme(:ggplot2)
+
 @sk_import preprocessing: StandardScaler
 @sk_import cluster: KMeans
 
@@ -58,9 +60,12 @@ cluster.labels_
 cluster.inertia_
 cluster.cluster_centers_
 
-ClusteringResult(result)
-
-scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = cluster.labels_)
+scatter(df.Social_support,
+        df.Ladder_score,
+        marker_z = cluster.labels_,
+        xaxis = "Social Support",
+        yaxis = "Happiness Score",
+        title = "Clustering of countries by Happiness factors")
 
 df.cluster = cluster.labels_
 
