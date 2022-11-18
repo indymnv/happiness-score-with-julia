@@ -6,6 +6,9 @@ using StatsPlots
 using Statistics
 using Random
 using ScikitLearn
+using PyCall
+@sk_import preprocessing: StandardScaler
+@sk_import cluster: KMeans
 
 df = DataFrame(CSV.File("./data/2021.csv",normalizenames =true),)
 
@@ -20,24 +23,30 @@ function normalize_features(df)
     return df
 end
 
-float_df=normalize_features(float_df)
+
+#X = normalize_features(float_df)
 select!(float_df, Not([:Standard_error_of_ladder_score, :Ladder_score_in_Dystopia, :Dystopia_residual,:upperwhisker, :lowerwhisker]))
 
-names(float_df)
 
-input = reshape(Matrix(float_df), (7,149))
+X = fit_transform!(StandardScaler(), Matrix(float_df))
+
+names(float_df)
 
 size(input)
 
 Random.seed!(123)
-result = kmeans(input, 3, maxiter=200, display=:iter)
+cluster =KMeans(n_clusters=3)
+
+cluster.fit(X)
+
+cluster.labels_
+cluster.inertia_
+cluster.cluster_centers_
 
 ClusteringResult(result)
 
-scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = result.assignments)
+scatter(df.Social_support, df.Healthy_life_expectancy, marker_z = cluster.labels_)
 
 df.cluster = result.assignments
 
-names(df)
 
-filter(row -> row.cluster ==2 , df).Country_name
