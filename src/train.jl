@@ -24,11 +24,36 @@ function read_file()
 end
 
 float_df, df = read_file()
-X = fit_transform!(StandardScaler(), Matrix(float_df))
 
-wcss = []
+function kmeans_train(df)
+    X = fit_transform!(StandardScaler(), Matrix(df))
 
-for n in 1:10
+    wcss = []
+    for n in 1:10
+
+        Random.seed!(123)
+        cluster =KMeans(n_clusters=n,
+                        init = "k-means++",
+                        max_iter = 20,
+                        n_init = 10,
+                        random_state = 0)
+        cluster.fit(X)
+        push!(wcss, cluster.inertia_)
+    end
+    return wcss
+end
+
+wcss = kmeans_train(float_df)
+
+plot(wcss, title = "wcss in each cluster",
+    xaxis = "cluster",
+   yaxis = "Wcss")
+
+#Decide the number of clusters with elbow curve, in my case i choose 3
+
+function kmeans_train(df, n)
+    X = fit_transform!(StandardScaler(), Matrix(df))
+
     Random.seed!(123)
     cluster =KMeans(n_clusters=n,
                     init = "k-means++",
@@ -36,21 +61,10 @@ for n in 1:10
                     n_init = 10,
                     random_state = 0)
     cluster.fit(X)
-    push!(wcss, cluster.inertia_)
+    return cluster
 end
 
-plot(wcss, title = "wcss in each cluster",
-    xaxis = "cluster",
-   yaxis = "Wcss")
-
-Random.seed!(123)
-cluster =KMeans(n_clusters=3)
-
-cluster.fit(X)
-
-cluster.labels_
-cluster.inertia_
-cluster.cluster_centers_
+cluster= kmeans_train(float_df, 3)
 
 scatter(df.Social_support,
         df.Ladder_score,
