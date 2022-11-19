@@ -75,8 +75,6 @@ scatter(df.Social_support,
 
 df.cluster = cluster.labels_
 
-df.cluster
-
 filter(row ->row.cluster ==0,df).Country_name
 
 histogram(filter(row ->row.cluster ==0,df).Ladder_score)
@@ -104,11 +102,28 @@ countries = GeoJSON.read(read(countries_file, String))
 
 df_world = DataFrame(countries)
 
+rename!(df, :Country_name => :ADMIN)
+
+df_world = leftjoin(df_world, df[!,[:ADMIN, :cluster]], on =:ADMIN)
+
+
+
+df_world = coalesce.(df_world, -1)
+
+df_world[!,:cluster] =string.(df_world[!,:cluster])
+
+replace!(df_world.cluster, "-1" => "gray",
+                    "0" => "red",
+                   "1" => "green",
+                   "2" => "yellow")
 
 n = length(countries)
-hm = GeoMakie.poly!(ax, countries; color= 1:n, colormap = :dense,
+hm = GeoMakie.poly!(ax, countries;
+                    color= df_world.cluster, colormap = :dense,
     strokecolor = :black, strokewidth = 0.5,
 )
 GeoMakie.translate!(hm, 0, 0, 100) # move above surface plot
 
 save("../01-happines/img/map.png", fig)
+
+1:n
