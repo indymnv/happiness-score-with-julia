@@ -106,8 +106,6 @@ rename!(df, :Country_name => :ADMIN)
 
 df_world = leftjoin(df_world, df[!,[:ADMIN, :cluster]], on =:ADMIN)
 
-
-
 df_world = coalesce.(df_world, -1)
 
 df_world[!,:cluster] =string.(df_world[!,:cluster])
@@ -118,7 +116,8 @@ replace!(df_world.cluster, "-1" => "gray",
                    "2" => "yellow")
 
 n = length(countries)
-hm = GeoMakie.poly!(ax, countries;
+
+hm = GeoMakie.poly!(ax, df_world;
                     color= df_world.cluster, colormap = :dense,
     strokecolor = :black, strokewidth = 0.5,
 )
@@ -126,4 +125,5 @@ GeoMakie.translate!(hm, 0, 0, 100) # move above surface plot
 
 save("../01-happines/img/map.png", fig)
 
-1:n
+
+
