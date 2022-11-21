@@ -17,9 +17,9 @@ function read_file()
     float_df = select(df, findall(col -> eltype(col) <: Float64, eachcol(df)))
     float_df = float_df[:,Not(names(select(float_df, r"Explained")))]   
     select!(float_df, Not([:Standard_error_of_ladder_score, 
+                           :Ladder_score, #Delete happiness score 
                            :Ladder_score_in_Dystopia, 
-                           :Dystopia_residual,:upperwhisker,
-                           :lowerwhisker]))
+                           :Dystopia_residual]))
     return float_df, df
 end
 
@@ -73,14 +73,25 @@ scatter(df.Social_support,
         yaxis = "Happiness Score",
         title = "Clustering of countries by Happiness factors")
 
-df.cluster = cluster.labels_
+df.cluster = cluster.labels_ .+1
 
-filter(row ->row.cluster ==0,df).Country_name
+filter(row ->row.cluster ==2,df).Country_name
 
-histogram(filter(row ->row.cluster ==0,df).Ladder_score)
-histogram!(filter(row ->row.cluster ==1,df).Ladder_score)
-histogram!(filter(row ->row.cluster ==2,df).Ladder_score)
+histogram(filter(row ->row.cluster ==1,df).Ladder_score, label = "cluster 1")
+histogram!(filter(row ->row.cluster ==2,df).Ladder_score, label = "cluster 2")
+histogram!(filter(row ->row.cluster ==3,df).Ladder_score, label = "cluster 3")
+
+filter(row ->row.Country_name =="Japan",df).cluster
+
+float_df = float_df[:,Not(names(select(float_df, r"Explained")))]
+N = ncol(float_df)
+numerical_cols = Symbol.(names(float_df,Real))
+@df float_df Plots.density(cols();
+                             layout=N,
+                             size=(2300,1200),
+                             title=permutedims(numerical_cols),
+                             group = df.cluster,
+                             label = false)
 
 
-filter(row ->row.Country_name =="Chile",df).cluster
 
