@@ -191,11 +191,11 @@ function boxplot_plot(df, x, y)
                   yaxis = true,
                 title = "Comparing $y by $x"
                )           )
-        #@df df dotplot!(
-        #                df[!,x],
-        #                df[!,y],
-        #        size =(1800,1000),
-        #       )
+        @df df dotplot!(
+                        df[!,x],
+                        df[!,y],
+                size =(1800,1000),
+               )
 end
 
 boxplot_plot(df_2021, "Regional_indicator", "Ladder_score")
