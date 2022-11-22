@@ -18,16 +18,17 @@ names(df_2021)
 
 scatter(
     df_2021.Social_support,
-    df_2021.Healthy_life_expectancy,
-    group = df_2021.Regional_indicator, 
+    df_2021.Ladder_score,
     size = (1000,800),
-    legend = :topleft,
+    label="country",
     xaxis = "Social Support",
-    yaxis = "Healthy Life Expectancy",
-    title = "Relation between Social Support and Life Expectancy by Region"
+    yaxis = "Ladder Score",
+    title = "Relation between Social Support and Happiness Index Score by country"
 )
 
-unique(df_2021.Regional.indicator)
+savefig("./img/scatterplot.png")
+
+unique(df_2021.Regional_indicator)
 
 #Counting countries by region and sort it
 sort(
@@ -41,6 +42,7 @@ float_df = select(df_2021, findall(col -> eltype(col) <: Float64, eachcol(df_202
 
 #Take away the Explained variables
 float_df = float_df[:,Not(names(select(float_df, r"Explained")))] #Take out all explained
+
 N = ncol(float_df)
 numerical_cols = Symbol.(names(float_df,Real))
 @df float_df Plots.histogram(cols();
