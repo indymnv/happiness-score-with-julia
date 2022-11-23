@@ -47,7 +47,10 @@ wcss = kmeans_train(float_df)
 
 plot(wcss, title = "wcss in each cluster",
     xaxis = "cluster",
-   yaxis = "Wcss")
+   yaxis = "Wcss",
+  label = false)
+
+savefig("./img/elbow.png")
 
 #Decide the number of clusters with elbow curve, in my case i choose 3
 
@@ -69,29 +72,37 @@ cluster= kmeans_train(float_df, 3)
 scatter(df.Social_support,
         df.Ladder_score,
         marker_z = cluster.labels_,
+        legend = false,
+        size = (1000,800),
         xaxis = "Social Support",
-        yaxis = "Happiness Score",
-        title = "Clustering of countries by Happiness factors")
+        yaxis = "Ladder Score",
+        title = "Comparison between social support and ladder score by country incorporating clustering")
+
+savefig("./img/cluster-scatter.png")
 
 df.cluster = cluster.labels_ .+1
 
 filter(row ->row.cluster ==2,df).Country_name
 
-histogram(filter(row ->row.cluster ==1,df).Ladder_score, label = "cluster 1")
+histogram(filter(row ->row.cluster ==1,df).Ladder_score, label = "cluster 1", title = "Distribution of Happiness Score by Cluster", xaxis = "Ladder Score", yaxis="n° countries")
 histogram!(filter(row ->row.cluster ==2,df).Ladder_score, label = "cluster 2")
 histogram!(filter(row ->row.cluster ==3,df).Ladder_score, label = "cluster 3")
 
-filter(row ->row.Country_name =="Japan",df).cluster
+savefig("./img/distribution.png")
+
+filter(row ->row.Country_name =="Chile",df).cluster
 
 float_df = float_df[:,Not(names(select(float_df, r"Explained")))]
 N = ncol(float_df)
 numerical_cols = Symbol.(names(float_df,Real))
 @df float_df Plots.density(cols();
                              layout=N,
-                             size=(2300,1200),
+                             size=(1600,1200),
                              title=permutedims(numerical_cols),
                              group = df.cluster,
                              label = false)
+
+savefig("./img/distr_cluster_vars.png")
 
 
 

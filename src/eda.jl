@@ -47,9 +47,11 @@ N = ncol(float_df)
 numerical_cols = Symbol.(names(float_df,Real))
 @df float_df Plots.histogram(cols();
                              layout=N,
-                             size=(2300,1200),
+                             size=(1400,800),
                              title=permutedims(numerical_cols),
                              label = false)
+
+savefig("./img/histograms.png")
 
 #Understand what is explained in variables in boxplots
 @df float_df boxplot(cols(), 
@@ -57,6 +59,8 @@ numerical_cols = Symbol.(names(float_df,Real))
                      linewidth=2,
                      title = "Comparing distribution for all variables in dataset",
                      legend = :topleft)
+
+savefig("./img/boxplot_all.png")
 
 # Top 5 and bottom 5 countries by ladder score
 sort!(df_2021, :Ladder_score, rev=true)
@@ -79,6 +83,8 @@ plot(
 size=(1000,800),
 yaxis = "Happines Score",
 )
+
+savefig("./img/rank.png")
 
 # pairplot for float variables
 @df float_df cornerplot(cols(),
@@ -108,6 +114,8 @@ function heatmap_cor(df)
 end
 
 heatmap_cor(float_df)
+
+savefig("./img/heatmap.png")
 
 #Select only variables considered for analysis (avoiding explained)
 function distribution_plot(df, var_filter, list_elements)
@@ -141,11 +149,10 @@ end
 #Ladder score distribution with some Regional_indicator
 distribution_plot(df_2021, "Country_name", ["Chile",
                                             "United States",
-                                            "Spain",
                                             "Japan",
-                                            "Brazil",
-                                            "China",
                                            ])
+
+savefig("./img/happiness_countries.png")
 
 #Select only variables considered for analysis Regional_indicator
 function distribution_plot(df)
@@ -156,7 +163,7 @@ function distribution_plot(df)
         label="Distribution" ,
         xaxis="Happiness Index Score", 
         yaxis ="Density", 
-        title ="Happiness Index Score by Region 2021") 
+        title ="Comparison Happiness Index Score by Region 2021") 
     )
     display(
         plot!([mean(df_2021.Ladder_score)],
@@ -179,7 +186,7 @@ end
 
 distribution_plot(df_2021)
 
-#savefig("./img/felicidad_paises.png")
+savefig("./img/happiness_region.png")
 
 
 #boxplot with all regional_indicator
@@ -188,15 +195,15 @@ function boxplot_plot(df, x, y)
         @df df boxplot(
                        df[!,x],
                        df[!,y],
-                size =(1800,1000),
-                  linewidth=2,
-                  yaxis = true,
-                title = "Comparing $y by $x"
+                       size =(1800,1000),
+                       linewidth=2,
+                       yaxis = true,
+                       title = "Comparing $y by $x"
                )           )
         @df df dotplot!(
                         df[!,x],
                         df[!,y],
-                size =(1800,1000),
+                        size =(1800,1000),
                )
 end
 
